@@ -60,6 +60,8 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run Pytest with Coverage
+        env:
+          PYTHONPATH: "api:indexer"
         run: |
           pytest api/tests indexer/tests --cov=api/app --cov=indexer/pipeline --cov-report=term-missing --cov-fail-under=60
 

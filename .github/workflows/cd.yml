@@ -32,6 +32,8 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run Pytest
+        env:
+          PYTHONPATH: "api:indexer"
         run: |
           pytest api/tests indexer/tests --cov=api/app --cov=indexer/pipeline
 
