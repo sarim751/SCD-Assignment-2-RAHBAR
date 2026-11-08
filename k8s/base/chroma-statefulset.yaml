@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chroma
+  namespace: rahbar
+  labels:
+    app: chroma
+spec:
+  serviceName: chroma
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chroma
+  template:
+    metadata:
+      labels:
+        app: chroma
+    spec:
+      serviceAccountName: rahbar-data
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: chroma
+          image: chromadb/chroma:1.0.12
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: IS_PERSISTENT
+              value: "TRUE"
+            - name: PERSIST_DIRECTORY
+              value: "/chroma/chroma"
+            - name: ANONYMIZED_TELEMETRY
+              value: "FALSE"
+          volumeMounts:
+            - name: chroma-data
+              mountPath: /chroma/chroma
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+  volumeClaimTemplates:
+    - metadata:
+        name: chroma-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi

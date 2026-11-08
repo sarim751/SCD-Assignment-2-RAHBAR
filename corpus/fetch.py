@@ -100,6 +100,7 @@ def fetch(force: bool) -> int:
         if index_path.exists() else {}
     entries, failures = [], []
     with httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True,
+                      verify=False,
                       timeout=httpx.Timeout(60.0, connect=15.0)) as client:
         for doc in docs:
             name, url = doc["name"], normalise(doc["url"])
