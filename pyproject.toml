@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+pythonpath = ["api", "indexer"]
+testpaths = ["api/tests", "indexer/tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
