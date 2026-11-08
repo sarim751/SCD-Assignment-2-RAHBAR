@@ -1,0 +1,3 @@
+$ kubectl get hpa -n rahbar
+NAME      REFERENCE        TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+api-hpa   Deployment/api   cpu: 18%/70%  3         8         3          15m
