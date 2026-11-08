@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import pytest
 from pydantic import ValidationError
 
 from app.config import Settings
 from app.providers.llm.base import LLMProvider
-from app.providers.llm.ollama import FALLBACK_ANSWER, OllamaProvider
+from app.providers.llm.ollama import FALLBACK_ANSWER
 from app.retrieval.base import Retriever
 from app.schemas import Answer, Citation, Passage
 from app.services.answer import answer_question
