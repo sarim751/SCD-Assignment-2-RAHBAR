@@ -119,15 +119,13 @@ jobs:
       - name: Build local API image for scan
         run: docker build -t rahbar-api:${{ github.sha }} api/
 
+      - name: Install Trivy Scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.58.2
+
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: rahbar-api:${{ github.sha }}
-          format: "table"
-          exit-code: "0"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
+        run: |
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 rahbar-api:${{ github.sha }}
 
   e2e-eval:
     name: E2E Evaluation Gate
