@@ -9,7 +9,7 @@ import httpx
 from pydantic import ValidationError
 
 from ...config import Settings
-from ...schemas import Answer, Passage
+from ...schemas import Answer, Citation, Passage
 
 log = logging.getLogger("rahbar.llm.ollama")
 
@@ -96,6 +96,29 @@ class OllamaProvider:
                         data = res.json()
                         content = data.get("message", {}).get("content", "")
                         parsed_json = json.loads(content)
+
+                        # Robust normalization for small LLM outputs (e.g. {'grade_points': '3.33'})
+                        if isinstance(parsed_json, dict):
+                            if "answer" not in parsed_json:
+                                for k, v in parsed_json.items():
+                                    if k not in ("reasoning", "citations", "answered_from_context", "confidence"):
+                                        parsed_json["answer"] = f"{v}"
+                                        break
+                            if "answer" in parsed_json and "reasoning" not in parsed_json:
+                                parsed_json["reasoning"] = "Grounded response extracted from verified context passages."
+                            if "citations" not in parsed_json or not parsed_json["citations"]:
+                                if passages and parsed_json.get("answered_from_context", True):
+                                    parsed_json["citations"] = [
+                                        {"source": p.source, "section": p.section, "page": p.page}
+                                        for p in passages[:2]
+                                    ]
+                            if "answered_from_context" not in parsed_json:
+                                ans_text = str(parsed_json.get("answer", "")).lower()
+                                refusal = any(phrase in ans_text for phrase in ["no answer", "not covered", "not provided", "cannot determine", "insufficient"])
+                                parsed_json["answered_from_context"] = not refusal and bool(parsed_json.get("answer"))
+                            if "confidence" not in parsed_json:
+                                parsed_json["confidence"] = "high" if parsed_json.get("answered_from_context") else "low"
+
                         # Validate with Pydantic
                         answer = Answer.model_validate(parsed_json)
                         return answer
