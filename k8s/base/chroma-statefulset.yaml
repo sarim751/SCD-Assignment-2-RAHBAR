@@ -18,6 +18,7 @@ spec:
     spec:
       serviceAccountName: rahbar-data
       automountServiceAccountToken: false
+      enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -29,6 +30,10 @@ spec:
             - containerPort: 8000
               name: http
           env:
+            - name: CHROMA_PORT
+              value: "8000"
+            - name: CHROMA_SERVER_HTTP_PORT
+              value: "8000"
             - name: IS_PERSISTENT
               value: "TRUE"
             - name: PERSIST_DIRECTORY
