@@ -1,0 +1,27 @@
+Install the 3 downloaded installers in your Downloads folder:
+Run Docker Desktop Installer.exe and let it finish (enable WSL 2 if prompted).
+
+Run minikube-installer.exe.
+Run OllamaSetup.exe.
+
+Start Ollama & Pull Models: Open a terminal:
+ollama pull nomic-embed-text
+ollama pull llama3.2:3b
+
+Start Minikube:
+minikube start --cni=calico --kubernetes-version=v1.31.0 --cpus=2 --memory=3500
+
+Deploy the RAHBAR System:
+if folder not open:
+cd C:\Users\HP\Desktop\SCD_Assignment_2
+kubectl apply -k k8s/overlays/dev
+else:
+kubectl apply -k k8s/overlays/dev
+
+Run the Indexer Job:
+kubectl apply -f k8s/base/indexer-job.yaml
+
+Open the Web UI:
+minikube service ui -n rahbar
+
+This will open the student chat interface in your browser where you can ask real questions about FAST-NUCES policies!
