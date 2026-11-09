@@ -36,13 +36,17 @@ spec:
               value: "8000"
             - name: IS_PERSISTENT
               value: "TRUE"
+            - name: PERSIST_PATH
+              value: "/data"
             - name: PERSIST_DIRECTORY
-              value: "/chroma/chroma"
+              value: "/data"
+            - name: CHROMA_PERSIST_DIRECTORY
+              value: "/data"
             - name: ANONYMIZED_TELEMETRY
               value: "FALSE"
           volumeMounts:
             - name: chroma-data
-              mountPath: /chroma/chroma
+              mountPath: /data
           resources:
             requests:
               cpu: 100m
