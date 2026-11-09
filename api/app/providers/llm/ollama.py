@@ -84,13 +84,13 @@ class OllamaProvider:
             ],
             "format": "json",
             "stream": False,
-            "options": {"temperature": self.settings.temperature},
+            "options": {"temperature": self.settings.temperature, "num_ctx": 2048},
         }
 
         # Attempt generation with one retry on validation failure
         for attempt in range(1, 3):
             try:
-                with httpx.Client(timeout=30.0) as client:
+                with httpx.Client(timeout=60.0) as client:
                     res = client.post(url, json=payload)
                     if res.status_code == 200:
                         data = res.json()

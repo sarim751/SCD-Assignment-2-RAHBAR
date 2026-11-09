@@ -25,10 +25,12 @@ spec:
           image: rahbar-indexer:latest
           imagePullPolicy: IfNotPresent
           command: ["python", "-m", "pipeline.run"]
-          args: ["--dummy"]
           envFrom:
             - configMapRef:
                 name: rahbar-config
+          env:
+            - name: CORPUS_DIR
+              value: "/corpus"
           resources:
             requests:
               cpu: 200m
@@ -45,6 +47,12 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: corpus-vol
+              mountPath: /corpus
       volumes:
         - name: tmp
           emptyDir: {}
+        - name: corpus-vol
+          hostPath:
+            path: /corpus
+            type: Directory

@@ -12,7 +12,7 @@ data:
   TEMPERATURE: "0.2"
   EMBED_MODEL: "nomic-embed-text"
   LLM_PROVIDER: "ollama-host"
-  LLM_MODEL: "llama3.2:3b"
+  LLM_MODEL: "qwen2.5:0.5b"
   CHROMA_HOST: "chroma"
   CHROMA_PORT: "8000"
   CHROMA_COLLECTION: "rahbar"
@@ -20,3 +20,4 @@ data:
   REDIS_PORT: "6379"
   OLLAMA_URL: "http://host.minikube.internal:11434"
   LOG_LEVEL: "INFO"
+  RETRIEVER: "chroma"
