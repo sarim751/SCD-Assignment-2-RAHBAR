@@ -50,11 +50,27 @@ def _extract_pdf(file_path: Path, source_name: str) -> list[Page]:
 
 def _extract_html(file_path: Path, source_name: str) -> list[Page]:
     raw = file_path.read_text(encoding="utf-8", errors="replace")
-    clean_text = re.sub(r"<script.*?</script>", "", raw, flags=re.DOTALL | re.IGNORECASE)
-    clean_text = re.sub(r"<style.*?</style>", "", clean_text, flags=re.DOTALL | re.IGNORECASE)
-    clean_text = re.sub(r"<[^>]+>", " ", clean_text)
-    clean_text = re.sub(r"\s+", " ", clean_text).strip()
-    return [Page(source=source_name, page=1, text=clean_text, ocr=False)]
+    # Strip script and style blocks
+    cleaned = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", raw, flags=re.S | re.I)
+    # Extract tables into markdown representation
+    tables = re.findall(r"<table[^>]*>(.*?)</table>", cleaned, flags=re.S | re.I)
+    md_tables = []
+    for tbl in tables:
+        rows = re.findall(r"<tr[^>]*>(.*?)</tr>", tbl, flags=re.S | re.I)
+        for r in rows:
+            cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", r, flags=re.S | re.I)
+            clean_cells = [re.sub(r"<[^>]+>", "", c).strip() for c in cells]
+            if clean_cells:
+                md_tables.append("| " + " | ".join(clean_cells) + " |")
+
+    # Clean tags and whitespace
+    text = re.sub(r"<[^>]+>", " ", cleaned)
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n\s*\n", "\n\n", text).strip()
+    if md_tables:
+        text += "\n\n" + "\n".join(md_tables)
+
+    return [Page(source=source_name, page=1, text=text, ocr=False)]
 
 
 def _extract_markdown(file_path: Path, source_name: str) -> list[Page]:
